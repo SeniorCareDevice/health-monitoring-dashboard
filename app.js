@@ -28,16 +28,13 @@ let latestData = {
 // API endpoint to receive data from ESP32
 app.post('/api/data', (req, res) => {
     console.log('Received data:', req.body);
-    
     // Update the latest data
     latestData = {
         ...req.body,
         timestamp: new Date()
     };
-    
     // Emit the new data to all connected clients
     io.emit('newData', latestData);
-    
     res.status(200).json({ message: 'Data received successfully' });
 });
 
@@ -54,10 +51,8 @@ app.get('/api/data', (req, res) => {
 // Socket.io connection handler
 io.on('connection', (socket) => {
     console.log('New client connected');
-    
     // Send the latest data to the newly connected client
     socket.emit('initialData', latestData);
-    
     socket.on('disconnect', () => {
         console.log('Client disconnected');
     });
