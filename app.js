@@ -2,21 +2,17 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const socketIo = require('socket.io');
-const bodyParser = require('body-parser');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
 // Middleware
-app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Store the latest data
 let latestData = {
     temperature: 0,
-    heartRate: 0,
-    spo2: 0,
     fallDetected: false,
     accMag: 0,
     latitude: 0,
@@ -24,19 +20,6 @@ let latestData = {
     satellites: 0,
     timestamp: new Date()
 };
-
-// API endpoint to receive data from ESP32
-app.post('/api/data', (req, res) => {
-    console.log('Received data:', req.body);
-    // Update the latest data
-    latestData = {
-        ...req.body,
-        timestamp: new Date()
-    };
-    // Emit the new data to all connected clients
-    io.emit('newData', latestData);
-    res.status(200).json({ message: 'Data received successfully' });
-});
 
 // Route for the main page
 app.get('/', (req, res) => {
@@ -48,11 +31,28 @@ app.get('/api/data', (req, res) => {
     res.json(latestData);
 });
 
-// Socket.io connection handler
+// WebSocket connection handler
 io.on('connection', (socket) => {
     console.log('New client connected');
     // Send the latest data to the newly connected client
     socket.emit('initialData', latestData);
+
+    // Handle incoming data from ESP32
+    socket.on('message', (data) => {
+        console.log('Received data:', data);
+        try {
+            const parsedData = JSON.parse(data);
+            latestData = {
+                ...parsedData,
+                timestamp: new Date()
+            };
+            // Broadcast the new data to all connected clients
+            io.emit('newData', latestData);
+        } catch (error) {
+            console.error('Error parsing data:', error);
+        }
+    });
+
     socket.on('disconnect', () => {
         console.log('Client disconnected');
     });
