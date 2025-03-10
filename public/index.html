@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Monitoring Dashboard</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Gauge.js for gauges -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gauge.js/1.3.7/gauge.min.js"></script>
+    
+    <!-- Socket.io client -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Health Monitoring Dashboard</h1>
+            <div class="status-indicator">
+                <span id="connection-status" class="connecting">Connecting...</span>
+                <span id="last-update"></span>
+            </div>
+        </header>
+        
+        <div class="dashboard">
+            <div class="vitals-section">
+                <div class="card">
+                    <h2>Temperature</h2>
+                    <div class="gauge-container">
+                        <canvas id="temperature-gauge"></canvas>
+                        <div class="gauge-value" id="temperature-value">-- °C</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2>Heart Rate</h2>
+                    <div class="gauge-container">
+                        <canvas id="heart-rate-gauge"></canvas>
+                        <div class="gauge-value" id="heart-rate-value">-- BPM</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2>SpO<sub>2</sub></h2>
+                    <div class="gauge-container">
+                        <canvas id="spo2-gauge"></canvas>
+                        <div class="gauge-value" id="spo2-value">-- %</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="monitoring-section">
+                <div class="card full-width">
+                    <h2>Fall Detection</h2>
+                    <div class="fall-status">
+                        <div id="fall-indicator" class="status-circle normal"></div>
+                        <div id="fall-status-text">No fall detected</div>
+                    </div>
+                    <div class="acceleration-data">
+                        <span>Acceleration: </span>
+                        <span id="acceleration-value">-- m/s²</span>
+                    </div>
+                </div>
+                
+                <div class="card full-width">
+                    <h2>Location</h2>
+                    <div id="map-container">
+                        <div id="map"></div>
+                        <div class="map-details">
+                            <div><strong>Latitude:</strong> <span id="latitude">--</span></div>
+                            <div><strong>Longitude:</strong> <span id="longitude">--</span></div>
+                            <div><strong>Satellites:</strong> <span id="satellites">--</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
