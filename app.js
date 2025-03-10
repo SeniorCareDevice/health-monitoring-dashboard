@@ -2,7 +2,6 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const socketIo = require('socket.io');
-
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -13,6 +12,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Store the latest data
 let latestData = {
     temperature: 0,
+    heartRate: 0,
+    spo2: 0,
     fallDetected: false,
     accMag: 0,
     latitude: 0,
@@ -31,21 +32,24 @@ app.get('/api/data', (req, res) => {
     res.json(latestData);
 });
 
-// WebSocket connection handler
+// Socket.io connection handler
 io.on('connection', (socket) => {
     console.log('New client connected');
+
     // Send the latest data to the newly connected client
     socket.emit('initialData', latestData);
 
     // Handle incoming data from ESP32
     socket.on('message', (data) => {
         console.log('Received data:', data);
+
         try {
             const parsedData = JSON.parse(data);
             latestData = {
                 ...parsedData,
                 timestamp: new Date()
             };
+
             // Broadcast the new data to all connected clients
             io.emit('newData', latestData);
         } catch (error) {
